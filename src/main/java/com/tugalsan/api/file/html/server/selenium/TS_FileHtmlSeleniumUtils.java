@@ -29,8 +29,9 @@ public class TS_FileHtmlSeleniumUtils {
     }
 
     private static TS_ThreadAsyncAwaitSingle<String> toHTML(TS_ThreadSyncTrigger killTrigger, String urlStr, Dimension scrnSize, Duration _waitForPageLoad, TGS_FuncMTUCE_OutBool_In1<String> _loadValidator, Duration _waitForPstTolerans) {
-        var waitForPageLoad = _waitForPageLoad == null || _waitForPageLoad.toSeconds() < 3 ? Duration.ofSeconds(3) : _waitForPageLoad;
-        var waitForPstTolerans = _waitForPstTolerans == null || _waitForPstTolerans.toSeconds() < 3 ? Duration.ofSeconds(3) : _waitForPstTolerans;
+        var threshold = 1;
+        var waitForPageLoad = _waitForPageLoad == null || _waitForPageLoad.toSeconds() < threshold ? Duration.ofSeconds(threshold) : _waitForPageLoad;
+        var waitForPstTolerans = _waitForPstTolerans == null || _waitForPstTolerans.toSeconds() < threshold ? Duration.ofSeconds(threshold) : _waitForPstTolerans;
         TGS_FuncMTUCE_OutBool_In1<String> loadValidator = _loadValidator == null ? html -> true : _loadValidator;
         return TS_ThreadAsyncAwait.callSingle(killTrigger, Duration.ofSeconds(waitForPageLoad.toSeconds() * 2 + waitForPstTolerans.toSeconds() * 2), kt -> {
             WebDriver driver = null;
