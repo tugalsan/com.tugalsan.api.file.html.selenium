@@ -1,17 +1,24 @@
 package com.tugalsan.api.file.html.server.selenium;
 
+import com.tugalsan.api.function.client.maythrow.checkedexceptions.TGS_FuncMTCEUtils;
 import com.tugalsan.api.function.client.maythrow.uncheckedexceptions.TGS_FuncMTUCE_OutBool_In1;
 import com.tugalsan.api.log.server.TS_Log;
 import com.tugalsan.api.thread.server.async.await.TS_ThreadAsyncAwait;
 import com.tugalsan.api.thread.server.async.await.TS_ThreadAsyncAwaitSingle;
 import com.tugalsan.api.thread.server.sync.TS_ThreadSyncTrigger;
 import com.tugalsan.api.thread.server.sync.TS_ThreadSyncWait;
+import com.tugalsan.api.union.client.TGS_UnionExcuseVoid;
 import com.tugalsan.api.url.client.TGS_Url;
 import java.awt.Dimension;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 
@@ -19,6 +26,34 @@ import org.openqa.selenium.edge.EdgeOptions;
 public class TS_FileHtmlSeleniumUtils {
 
     final private static TS_Log d = TS_Log.of(TS_FileHtmlSeleniumUtils.class);
+
+    public static TGS_UnionExcuseVoid toPdf(Path inputPath, Path outputPath) {
+        WebDriver _driver = null;
+        try {
+            return TGS_FuncMTCEUtils.call(() -> {
+                var options = new ChromeOptions();
+                options.addArguments("--headless", "--disable-gpu", "--run-all-compositor-stages-before-draw", "--remote-allow-origins=*");
+                var chromeDriver = new ChromeDriver(options);
+                chromeDriver.get(inputPath.toString());
+                Map<String, Object> params = new HashMap();
+                var command = "Page.printToPDF";
+                Map<String, Object> output = chromeDriver.executeCdpCommand(command, params);
+                try (var os = Files.newOutputStream(outputPath)) {
+                    var byteArray = java.util.Base64.getDecoder().decode((String) output.get("data"));
+                    os.write(byteArray);
+                    os.close();
+                }
+                return TGS_UnionExcuseVoid.ofVoid();
+            }, e -> TGS_UnionExcuseVoid.ofExcuse(e));
+        } finally {
+//            if (driver != null) {//gives error!
+//                driver.close();
+//            }
+            if (_driver != null) {
+                _driver.quit();
+            }
+        }
+    }
 
     public static TS_ThreadAsyncAwaitSingle<String> toHTML(TS_ThreadSyncTrigger killTrigger, TGS_Url url, Dimension scrnSize, Duration waitForPageLoad, TGS_FuncMTUCE_OutBool_In1<String> loadValidator, Duration waitForPstTolerans) {
         return toHTML(killTrigger, url.toString(), scrnSize, waitForPageLoad, loadValidator, waitForPstTolerans);
