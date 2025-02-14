@@ -13,42 +13,45 @@ import java.awt.Dimension;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Base64;
 import java.util.Objects;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.print.PageMargin;
+import org.openqa.selenium.print.PageSize;
+import org.openqa.selenium.print.PrintOptions;
 
 //https://stackoverflow.com/questions/79432850/selenium-driver-is-not-waiting-for-the-page-to-load-on-java-for-mermaid-js
 public class TS_FileHtmlSeleniumUtils {
 
     final private static TS_Log d = TS_Log.of(TS_FileHtmlSeleniumUtils.class);
 
-    public static TGS_UnionExcuseVoid toPdf(Path inputPath, Path outputPath) {
+    public static PrintOptions toPrintOptions(boolean isLandScape, float scale, int pageWitdh, int pageHeight, int marginLeft, int marginRight, int marginTop, int marginBottom) {
+        var po = new PrintOptions();
+        po.setOrientation(isLandScape ? PrintOptions.Orientation.LANDSCAPE : PrintOptions.Orientation.PORTRAIT);
+        po.setScale(scale);
+        po.setPageSize(new PageSize(pageWitdh, pageHeight));
+        po.setPageMargin(new PageMargin(marginTop, marginBottom, marginLeft, marginRight));
+        return po;
+    }
+
+    public static TGS_UnionExcuseVoid toPdf(Path urlPath, Path outputPath, PrintOptions printOptions) {
         WebDriver _driver = null;
         try {
             return TGS_FuncMTCEUtils.call(() -> {
                 var options = new ChromeOptions();
-                options.addArguments("--headless", "--disable-gpu", "--run-all-compositor-stages-before-draw", "--remote-allow-origins=*");
-                var chromeDriver = new ChromeDriver(options);
-                chromeDriver.get(inputPath.toString());
-                Map<String, Object> params = new HashMap();
-                var command = "Page.printToPDF";
-                Map<String, Object> output = chromeDriver.executeCdpCommand(command, params);
-                try (var os = Files.newOutputStream(outputPath)) {
-                    var byteArray = java.util.Base64.getDecoder().decode((String) output.get("data"));
-                    os.write(byteArray);
-                    os.close();
-                }
+                options.addArguments("--headless", "--disable-gpu", "--run-all-compositor-stages-before-draw", "--remote-allow-origins=*", "--kiosk-printing", "--scalingType:3", "--scaling:10");
+                var driver = new ChromeDriver(options);
+                driver.get(urlPath.toUri().toString());
+                var pdf = driver.print(printOptions);
+                var pdfContent = Base64.getDecoder().decode(pdf.getContent());
+                Files.write(outputPath, pdfContent);
                 return TGS_UnionExcuseVoid.ofVoid();
             }, e -> TGS_UnionExcuseVoid.ofExcuse(e));
         } finally {
-//            if (driver != null) {//gives error!
-//                driver.close();
-//            }
             if (_driver != null) {
                 _driver.quit();
             }
@@ -74,6 +77,7 @@ public class TS_FileHtmlSeleniumUtils {
             _driver = new EdgeDriver(options);
             _driver.manage().timeouts().implicitlyWait(waitForPageLoad);
             _driver.manage().timeouts().pageLoadTimeout(waitForPageLoad);
+            _driver.manage().window().setPosition(new org.openqa.selenium.Point(0, 0));
             _driver.manage().window().setSize(new org.openqa.selenium.Dimension(scrnSize.width, scrnSize.height));
             var driver = _driver;
             return TS_ThreadAsyncAwait.callSingle(killTrigger, Duration.ofSeconds(waitForPageLoad.toSeconds() * 2 + waitForPstTolerans.toSeconds() * 2), kt -> {
@@ -101,9 +105,6 @@ public class TS_FileHtmlSeleniumUtils {
                 return driver.getPageSource();
             });
         } finally {
-//            if (driver != null) {//gives error!
-//                driver.close();
-//            }
             if (_driver != null) {
                 _driver.quit();
             }
