@@ -33,18 +33,18 @@ public class TS_FileHtmlSeleniumUtils {
         var waitForPageLoad = _waitForPageLoad == null || _waitForPageLoad.toSeconds() < threshold ? Duration.ofSeconds(threshold) : _waitForPageLoad;
         var waitForPstTolerans = _waitForPstTolerans == null || _waitForPstTolerans.toSeconds() < threshold ? Duration.ofSeconds(threshold) : _waitForPstTolerans;
         TGS_FuncMTUCE_OutBool_In1<String> loadValidator = _loadValidator == null ? html -> true : _loadValidator;
-        return TS_ThreadAsyncAwait.callSingle(killTrigger, Duration.ofSeconds(waitForPageLoad.toSeconds() * 2 + waitForPstTolerans.toSeconds() * 2), kt -> {
-            WebDriver driver = null;
-            try {
-                var options = new EdgeOptions();
-                driver = new EdgeDriver(options);
-                driver.manage().timeouts().implicitlyWait(waitForPageLoad);
-                driver.manage().timeouts().pageLoadTimeout(waitForPageLoad);
-                driver.manage().window().setSize(new org.openqa.selenium.Dimension(scrnSize.width, scrnSize.height));
+        WebDriver _driver = null;
+        try {
+            var options = new EdgeOptions();
+            _driver = new EdgeDriver(options);
+            _driver.manage().timeouts().implicitlyWait(waitForPageLoad);
+            _driver.manage().timeouts().pageLoadTimeout(waitForPageLoad);
+            _driver.manage().window().setSize(new org.openqa.selenium.Dimension(scrnSize.width, scrnSize.height));
+            var driver = _driver;
+            return TS_ThreadAsyncAwait.callSingle(killTrigger, Duration.ofSeconds(waitForPageLoad.toSeconds() * 2 + waitForPstTolerans.toSeconds() * 2), kt -> {
                 TS_ThreadSyncWait.of(d.className, kt, waitForPageLoad);
                 driver.get(urlStr);
                 String sourcePre = null;
-                String sourceCurrent = null;
                 while (kt.hasNotTriggered() && sourcePre == null) {
                     d.cr("processHTML", "while0", "thick");
                     sourcePre = driver.getPageSource();
@@ -55,6 +55,7 @@ public class TS_FileHtmlSeleniumUtils {
                     sourcePre = driver.getPageSource();
                     TS_ThreadSyncWait.milliseconds100();
                 }
+                String sourceCurrent = null;
                 while (kt.hasNotTriggered() && !Objects.equals(sourcePre, sourceCurrent)) {
                     d.cr("processHTML", "while2", "thick");
                     sourcePre = sourceCurrent;
@@ -63,14 +64,14 @@ public class TS_FileHtmlSeleniumUtils {
                 }
                 TS_ThreadSyncWait.of(d.className, kt, waitForPstTolerans);
                 return driver.getPageSource();
-            } finally {
+            });
+        } finally {
 //            if (driver != null) {//gives error!
 //                driver.close();
 //            }
-                if (driver != null) {
-                    driver.quit();
-                }
+            if (_driver != null) {
+                _driver.quit();
             }
-        });
+        }
     }
 }
