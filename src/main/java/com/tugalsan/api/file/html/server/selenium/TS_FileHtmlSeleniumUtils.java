@@ -46,20 +46,20 @@ public class TS_FileHtmlSeleniumUtils {
                 driver.get(urlStr);
                 String sourcePre = null;
                 while (kt.hasNotTriggered() && sourcePre == null) {
-                    d.cr("processHTML", "while0", "thick");
+                    d.cr("processHTML", "while.null", "thick");
                     sourcePre = driver.getPageSource();
                     TS_ThreadSyncWait.milliseconds100();
                 }
                 while (kt.hasNotTriggered() && !loadValidator.validate(sourcePre)) {
-                    d.cr("processHTML", "while1", "thick");
+                    d.cr("processHTML", "while.validate", "thick");
                     sourcePre = driver.getPageSource();
-                    TS_ThreadSyncWait.milliseconds100();
+                    TS_ThreadSyncWait.milliseconds200();
                 }
                 String sourceCurrent = null;
                 while (kt.hasNotTriggered() && !Objects.equals(sourcePre, sourceCurrent)) {
-                    d.cr("processHTML", "while2", "thick");
+                    d.cr("processHTML", "while.processed", "thick");
                     sourcePre = sourceCurrent;
-                    TS_ThreadSyncWait.milliseconds100();
+                    TS_ThreadSyncWait.milliseconds500();
                     sourceCurrent = driver.getPageSource();
                 }
                 TS_ThreadSyncWait.of(d.className, kt, waitForPstTolerans);
