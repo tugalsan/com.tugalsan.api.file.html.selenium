@@ -29,11 +29,19 @@ public class TS_FileHtmlSeleniumUtils {
 
     final private static TS_Log d = TS_Log.of(TS_FileHtmlSeleniumUtils.class);
 
-    public static PrintOptions toPrintOptions(boolean isLandScape, float scale, int pageWitdh, int pageHeight, int marginLeft, int marginRight, int marginTop, int marginBottom) {
+    public static PrintOptions toPrintOptions(boolean isLandScape, Float scale, Dimension pageSize, Integer marginLeft, Integer marginRight, Integer marginTop, Integer marginBottom) {
         var po = new PrintOptions();
         po.setOrientation(isLandScape ? PrintOptions.Orientation.LANDSCAPE : PrintOptions.Orientation.PORTRAIT);
-        po.setScale(scale);
-        po.setPageSize(new PageSize(pageWitdh, pageHeight));
+        if (scale != null) {
+            po.setScale(scale);
+        }
+        if (pageSize != null) {
+            po.setPageSize(new PageSize(pageSize.width, pageSize.height));
+        }
+        marginTop = marginTop == null ? 0 : marginTop;
+        marginBottom = marginBottom == null ? 0 : marginBottom;
+        marginLeft = marginLeft == null ? 0 : marginLeft;
+        marginRight = marginRight == null ? 0 : marginRight;
         po.setPageMargin(new PageMargin(marginTop, marginBottom, marginLeft, marginRight));
         return po;
     }
