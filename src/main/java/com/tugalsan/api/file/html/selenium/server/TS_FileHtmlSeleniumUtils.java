@@ -1,4 +1,4 @@
-package com.tugalsan.api.file.html.server.selenium;
+package com.tugalsan.api.file.html.selenium.server;
 
 import com.tugalsan.api.function.client.maythrow.checkedexceptions.TGS_FuncMTCEUtils;
 import com.tugalsan.api.function.client.maythrow.uncheckedexceptions.TGS_FuncMTUCE_OutBool_In1;

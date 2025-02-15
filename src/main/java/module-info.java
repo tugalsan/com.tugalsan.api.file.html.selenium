@@ -10,5 +10,5 @@ module com.tugalsan.api.file.html.selenium {
     requires com.tugalsan.api.url;
     requires com.tugalsan.api.union;
     requires com.tugalsan.api.function;
-    exports com.tugalsan.api.file.html.server.selenium;
+    exports com.tugalsan.api.file.html.selenium.server;
 }
