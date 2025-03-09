@@ -88,7 +88,7 @@ public class TS_FileHtmlSeleniumUtils {
             _driver.manage().window().setPosition(new org.openqa.selenium.Point(0, 0));
             _driver.manage().window().setSize(new org.openqa.selenium.Dimension(scrnSize.width, scrnSize.height));
             var driver = _driver;
-            return TS_ThreadAsyncAwait.callSingle(killTrigger, Duration.ofSeconds(waitForPageLoad.toSeconds() * 2 + waitForPstTolerans.toSeconds() * 2), kt -> {
+            return TS_ThreadAsyncAwait.callSingle(killTrigger.newChild(d.className), Duration.ofSeconds(waitForPageLoad.toSeconds() * 2 + waitForPstTolerans.toSeconds() * 2), kt -> {
                 TS_ThreadSyncWait.of(d.className, kt, waitForPageLoad);
                 driver.get(urlStr);
                 String sourcePre = null;
