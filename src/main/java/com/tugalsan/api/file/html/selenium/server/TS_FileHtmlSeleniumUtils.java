@@ -30,7 +30,10 @@ public class TS_FileHtmlSeleniumUtils {
 
     }
 
-    final private static TS_Log d = TS_Log.of(TS_FileHtmlSeleniumUtils.class);
+    private static TS_Log d() {
+        return d.orElse(TS_Log.of( TS_FileHtmlSeleniumUtils.class));
+    }
+    final private static StableValue<TS_Log> d = StableValue.of();
 
     public static PrintOptions toPrintOptions(boolean isLandScape, Float scale, Dimension pageSize, Integer marginLeft, Integer marginRight, Integer marginTop, Integer marginBottom) {
         var po = new PrintOptions();
@@ -84,28 +87,28 @@ public class TS_FileHtmlSeleniumUtils {
             driver.manage().timeouts().pageLoadTimeout(waitForPageLoad);
             driver.manage().window().setPosition(new org.openqa.selenium.Point(0, 0));
             driver.manage().window().setSize(new org.openqa.selenium.Dimension(scrnSize.width, scrnSize.height));
-            return TS_ThreadAsyncAwait.callSingle(killTrigger.newChild(d.className).newChild("toHTML"), Duration.ofSeconds(waitForPageLoad.toSeconds() * 2 + waitForPstTolerans.toSeconds() * 2), kt -> {
-                TS_ThreadSyncWait.of(d.className, kt, waitForPageLoad);
+            return TS_ThreadAsyncAwait.callSingle(killTrigger.newChild(d().className).newChild("toHTML"), Duration.ofSeconds(waitForPageLoad.toSeconds() * 2 + waitForPstTolerans.toSeconds() * 2), kt -> {
+                TS_ThreadSyncWait.of(d().className, kt, waitForPageLoad);
                 driver.get(urlStr);
                 String sourcePre = null;
                 while (kt.hasNotTriggered() && sourcePre == null) {
-                    d.cr("processHTML", "while.null", "tick");
+                    d().cr("processHTML", "while.null", "tick");
                     sourcePre = driver.getPageSource();
                     TS_ThreadSyncWait.milliseconds100();
                 }
                 while (kt.hasNotTriggered() && !loadValidator.validate(sourcePre)) {
-                    d.cr("processHTML", "while.validate", "tick");
+                    d().cr("processHTML", "while.validate", "tick");
                     sourcePre = driver.getPageSource();
                     TS_ThreadSyncWait.milliseconds200();
                 }
                 String sourceCurrent = null;
                 while (kt.hasNotTriggered() && !Objects.equals(sourcePre, sourceCurrent)) {
-                    d.cr("processHTML", "while.processed", "tick");
+                    d().cr("processHTML", "while.processed", "tick");
                     sourcePre = sourceCurrent;
                     TS_ThreadSyncWait.milliseconds500();
                     sourceCurrent = driver.getPageSource();
                 }
-                TS_ThreadSyncWait.of(d.className, kt, waitForPstTolerans);
+                TS_ThreadSyncWait.of(d().className, kt, waitForPstTolerans);
                 return driver.getPageSource();
             });
         }
