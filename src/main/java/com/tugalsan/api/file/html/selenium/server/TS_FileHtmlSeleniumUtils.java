@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.function.Supplier;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.print.PageMargin;
@@ -31,7 +30,7 @@ public class TS_FileHtmlSeleniumUtils {
 
     }
 
-    final private static Supplier<TS_Log> d = StableValue.supplier(() -> TS_Log.of(TS_FileHtmlSeleniumUtils.class));
+    final private static TS_Log d = TS_Log.of(TS_FileHtmlSeleniumUtils.class);
 
     public static PrintOptions toPrintOptions(boolean isLandScape, Float scale, Dimension pageSize, Integer marginLeft, Integer marginRight, Integer marginTop, Integer marginBottom) {
         var po = new PrintOptions();
@@ -85,28 +84,28 @@ public class TS_FileHtmlSeleniumUtils {
             driver.manage().timeouts().pageLoadTimeout(waitForPageLoad);
             driver.manage().window().setPosition(new org.openqa.selenium.Point(0, 0));
             driver.manage().window().setSize(new org.openqa.selenium.Dimension(scrnSize.width, scrnSize.height));
-            return TS_ThreadAsyncAwait.callSingle(killTrigger.newChild(d.get().className).newChild("toHTML"), Duration.ofSeconds(waitForPageLoad.toSeconds() * 2 + waitForPstTolerans.toSeconds() * 2), kt -> {
-                TS_ThreadSyncWait.of(d.get().className, kt, waitForPageLoad);
+            return TS_ThreadAsyncAwait.callSingle(killTrigger.newChild(d.className()).newChild("toHTML"), Duration.ofSeconds(waitForPageLoad.toSeconds() * 2 + waitForPstTolerans.toSeconds() * 2), kt -> {
+                TS_ThreadSyncWait.of(d.className(), kt, waitForPageLoad);
                 driver.get(urlStr);
                 String sourcePre = null;
                 while (kt.hasNotTriggered() && sourcePre == null) {
-                    d.get().cr("processHTML", "while.null", "tick");
+                    d.cr("processHTML", "while.null", "tick");
                     sourcePre = driver.getPageSource();
                     TS_ThreadSyncWait.milliseconds100();
                 }
                 while (kt.hasNotTriggered() && !loadValidator.validate(sourcePre)) {
-                    d.get().cr("processHTML", "while.validate", "tick");
+                    d.cr("processHTML", "while.validate", "tick");
                     sourcePre = driver.getPageSource();
                     TS_ThreadSyncWait.milliseconds200();
                 }
                 String sourceCurrent = null;
                 while (kt.hasNotTriggered() && !Objects.equals(sourcePre, sourceCurrent)) {
-                    d.get().cr("processHTML", "while.processed", "tick");
+                    d.cr("processHTML", "while.processed", "tick");
                     sourcePre = sourceCurrent;
                     TS_ThreadSyncWait.milliseconds500();
                     sourceCurrent = driver.getPageSource();
                 }
-                TS_ThreadSyncWait.of(d.get().className, kt, waitForPstTolerans);
+                TS_ThreadSyncWait.of(d.className(), kt, waitForPstTolerans);
                 return driver.getPageSource();
             });
         }
