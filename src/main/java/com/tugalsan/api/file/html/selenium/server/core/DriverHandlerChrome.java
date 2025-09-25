@@ -1,7 +1,6 @@
 package com.tugalsan.api.file.html.selenium.server.core;
 
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import module org.seleniumhq.selenium.chrome_driver;
 
 public class DriverHandlerChrome implements AutoCloseable {
 

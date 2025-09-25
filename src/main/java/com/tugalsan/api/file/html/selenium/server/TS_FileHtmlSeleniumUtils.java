@@ -1,28 +1,25 @@
 package com.tugalsan.api.file.html.selenium.server;
 
+import module com.tugalsan.api.function;
+import module com.tugalsan.api.log;
+import module com.tugalsan.api.thread;
+import module com.tugalsan.api.union;
+import module com.tugalsan.api.url;
+import module org.seleniumhq.selenium.chrome_driver;
+import module org.seleniumhq.selenium.edge_driver;
+import module org.seleniumhq.selenium.api;
 import com.tugalsan.api.file.html.selenium.server.core.DriverHandlerChrome;
 import com.tugalsan.api.file.html.selenium.server.core.DriverHandlerEdge;
-import com.tugalsan.api.function.client.maythrowexceptions.checked.TGS_FuncMTCUtils;
-import com.tugalsan.api.function.client.maythrowexceptions.unchecked.TGS_FuncMTU_OutBool_In1;
-import com.tugalsan.api.log.server.TS_Log;
-import com.tugalsan.api.thread.server.async.await.TS_ThreadAsyncAwait;
-import com.tugalsan.api.thread.server.async.await.TS_ThreadAsyncAwaitRecords.AnySuccessfulOrThrow;
-import com.tugalsan.api.thread.server.sync.TS_ThreadSyncTrigger;
-import com.tugalsan.api.thread.server.sync.TS_ThreadSyncWait;
-import com.tugalsan.api.union.client.TGS_UnionExcuseVoid;
-import com.tugalsan.api.url.client.TGS_Url;
-import java.awt.Dimension;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Base64;
-import java.util.Objects;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.edge.EdgeOptions;
-import org.openqa.selenium.print.PageMargin;
-import org.openqa.selenium.print.PageSize;
-import org.openqa.selenium.print.PrintOptions;
+import org.openqa.selenium.Dimension;
+import java.nio.file.*;
+import java.time.*;
+import java.util.*;
 
+//import org.openqa.selenium.chrome.ChromeOptions;
+//import org.openqa.selenium.edge.EdgeOptions;
+//import org.openqa.selenium.print.PageMargin;
+//import org.openqa.selenium.print.PageSize;
+//import org.openqa.selenium.print.PrintOptions;
 //https://stackoverflow.com/questions/79432850/selenium-driver-is-not-waiting-for-the-page-to-load-on-java-for-mermaid-js
 public class TS_FileHtmlSeleniumUtils {
 
@@ -64,15 +61,15 @@ public class TS_FileHtmlSeleniumUtils {
         }, e -> TGS_UnionExcuseVoid.ofExcuse(e));
     }
 
-    public static AnySuccessfulOrThrow<String> toHTML(TS_ThreadSyncTrigger killTrigger, TGS_Url url, Dimension scrnSize, Duration waitForPageLoad, TGS_FuncMTU_OutBool_In1<String> loadValidator, Duration waitForPstTolerans) {
+    public static TS_ThreadAsyncAwaitRecords.AnySuccessfulOrThrow<String> toHTML(TS_ThreadSyncTrigger killTrigger, TGS_Url url, Dimension scrnSize, Duration waitForPageLoad, TGS_FuncMTU_OutBool_In1<String> loadValidator, Duration waitForPstTolerans) {
         return toHTML(killTrigger, url.toString(), scrnSize, waitForPageLoad, loadValidator, waitForPstTolerans);
     }
 
-    public static AnySuccessfulOrThrow<String> toHTML(TS_ThreadSyncTrigger killTrigger, Path urlPath, Dimension scrnSize, Duration waitForPageLoad, TGS_FuncMTU_OutBool_In1<String> loadValidator, Duration waitForPstTolerans) {
+    public static TS_ThreadAsyncAwaitRecords.AnySuccessfulOrThrow<String> toHTML(TS_ThreadSyncTrigger killTrigger, Path urlPath, Dimension scrnSize, Duration waitForPageLoad, TGS_FuncMTU_OutBool_In1<String> loadValidator, Duration waitForPstTolerans) {
         return toHTML(killTrigger, urlPath.toUri().toString(), scrnSize, waitForPageLoad, loadValidator, waitForPstTolerans);
     }
 
-    private static AnySuccessfulOrThrow<String> toHTML(TS_ThreadSyncTrigger killTrigger, String urlStr, Dimension scrnSize, Duration _waitForPageLoad, TGS_FuncMTU_OutBool_In1<String> _loadValidator, Duration _waitForPstTolerans) {
+    private static TS_ThreadAsyncAwaitRecords.AnySuccessfulOrThrow<String> toHTML(TS_ThreadSyncTrigger killTrigger, String urlStr, Dimension scrnSize, Duration _waitForPageLoad, TGS_FuncMTU_OutBool_In1<String> _loadValidator, Duration _waitForPstTolerans) {
         var threshold = 1;
         var waitForPageLoad = _waitForPageLoad == null || _waitForPageLoad.toSeconds() < threshold ? Duration.ofSeconds(threshold) : _waitForPageLoad;
         var waitForPstTolerans = _waitForPstTolerans == null || _waitForPstTolerans.toSeconds() < threshold ? Duration.ofSeconds(threshold) : _waitForPstTolerans;

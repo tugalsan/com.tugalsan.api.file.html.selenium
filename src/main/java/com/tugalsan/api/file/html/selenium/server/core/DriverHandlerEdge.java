@@ -1,7 +1,6 @@
 package com.tugalsan.api.file.html.selenium.server.core;
 
-import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.edge.EdgeOptions;
+import module org.seleniumhq.selenium.edge_driver;
 
 public class DriverHandlerEdge implements AutoCloseable {
 
